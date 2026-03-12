@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Architecture:
  *   HTTP request → Controller → Service → Repository → PostgreSQL / pgvector
  *                                    ↓
- *                               AI layer → Ollama (LLM + embeddings)
+ *                               AI layer → Groq (LLM + embeddings)
  *
  * Core features:
  *   - Document upload (PDF, DOCX, TXT) with automatic text chunking and embedding
