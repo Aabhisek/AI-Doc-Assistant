@@ -1,0 +1,71 @@
+version: "3.9"
+
+# ── AI Document Assistant — Docker Compose ────────────────────────────────────
+#
+# Services:
+#   postgres  — PostgreSQL 16 with pgvector extension
+#   backend   — Spring Boot API (chat via Groq, embeddings via Jina AI)
+#   frontend  — React app (via nginx)
+#
+# Quick start:
+#   export GROQ_API_KEY=your_key_here    # free key at console.groq.com
+#   export JINA_API_KEY=your_key_here    # free key at jina.ai (1M tokens/month)
+#   docker compose up -d
+#   open http://localhost:3000
+
+services:
+
+  # ── PostgreSQL + pgvector ───────────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    environment:
+      POSTGRES_DB:       ragdb
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ragdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Backend ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL:          jdbc:postgresql://postgres:5432/ragdb
+      DB_USER:         postgres
+      DB_PASS:         postgres
+      GROQ_API_KEY:    ${GROQ_API_KEY}
+      JINA_API_KEY:    ${JINA_API_KEY}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads_data:/app/uploads
+    restart: unless-stopped
+
+  # ── React Frontend (nginx) ──────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: rag-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  uploads_data:

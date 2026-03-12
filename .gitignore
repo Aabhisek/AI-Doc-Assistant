@@ -1,25 +1,68 @@
-HELP.md
+# ── Maven build output ────────────────────────────────────────────────────────
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# ── Spring Boot / Java ────────────────────────────────────────────────────────
+*.log
+*.log.*
+logs/
+spring-shell.log
+HELP.md
 
-### IntelliJ IDEA ###
-.idea
+# Local override properties (never commit local secrets via properties files)
+application-local.properties
+application-local.yml
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+
+# ── Secrets & API keys ────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.jks
+
+# ── Uploaded user files ───────────────────────────────────────────────────────
+uploads/
+
+# ── Frontend (React / Node) ───────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+frontend/.vite/
+frontend/coverage/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# ── IDE — IntelliJ IDEA ───────────────────────────────────────────────────────
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ── IDE — VS Code ─────────────────────────────────────────────────────────────
+.vscode/
+
+# ── IDE — Eclipse / STS ───────────────────────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# ── IDE — NetBeans ────────────────────────────────────────────────────────────
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +72,32 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# ── IDE — Cursor ──────────────────────────────────────────────────────────────
+.cursor/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# ── Windows ───────────────────────────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── Linux ─────────────────────────────────────────────────────────────────────
+*~
+
+# ── Temp / OS scratch ─────────────────────────────────────────────────────────
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# ── Personal / interview notes ────────────────────────────────────────────────
+INTERVIEW_TALKING_POINTS.md

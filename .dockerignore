@@ -1,0 +1,6 @@
+target/
+.git/
+.cursor/
+frontend/node_modules/
+uploads/
+*.log
