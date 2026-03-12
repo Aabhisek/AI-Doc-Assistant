@@ -18,7 +18,7 @@ Shows the system as a black box, surrounded by the actors and external systems i
 
 ```
                         ┌─────────────────────────────────────────────────────────┐
-                        │               AI Document Assistant System               │
+                        │               AI Document Assistant System              │
                         │                                                         │
   ┌──────────┐  upload  │  ┌──────────────┐    REST/HTTP   ┌────────────────────┐ │
   │          │─────────▶│  │              │◀──────────────▶│                    │ │
@@ -29,14 +29,14 @@ Shows the system as a black box, surrounded by the actors and external systems i
                         │                                            │            │
                         │                          ┌─────────────────┼──────────┐ │
                         │                          │                 │          │ │
-                        │                   ┌──────▼──────┐  ┌──────▼───────┐  │ │
-                        │                   │ PostgreSQL  │  │   File       │  │ │
-                        │                   │ + pgvector  │  │   System     │  │ │
-                        │                   │ (port 5432) │  │ (./uploads/) │  │ │
-                        │                   └─────────────┘  └──────────────┘  │ │
+                        │                   ┌──────▼──────┐  ┌──────▼───────┐   │ │
+                        │                   │ PostgreSQL  │  │   File       │   │ │
+                        │                   │ + pgvector  │  │   System     │   │ │
+                        │                   │ (port 5432) │  │ (./uploads/) │   │ │
+                        │                   └─────────────┘  └──────────────┘   │ │
                         │                                                       │ │
                         └───────────────────────────────────────────────────────┘ │
-                                                                                   │
+                                                                                    │
               External Services (Cloud APIs)                                       │
               ┌────────────────────────────────────────────────────────────────────┘
               │
@@ -66,42 +66,42 @@ Shows the major internal components and how they are layered.
 ┌────────────────────────────────────────────────────────────────────────────────────┐
 │                              FRONTEND (React + Vite)                               │
 │                                                                                    │
-│   ┌──────────────┐  ┌──────────────┐  ┌─────────────┐  ┌────────────────────┐    │
-│   │DocumentUpload│  │ DocumentList │  │  ChatInput  │  │    ActionBar       │    │
-│   │  (dropzone)  │  │  (sidebar)   │  │  + ChatMsg  │  │ (summarize/extract │    │
-│   └──────────────┘  └──────────────┘  └─────────────┘  │  /compare)        │    │
-│                                                          └────────────────────┘    │
-│                        ┌──────────────────────────┐                               │
-│                        │     services/api.js       │  (Axios HTTP client)         │
-│                        └───────────────────────────┘                              │
+│   ┌──────────────┐  ┌──────────────┐  ┌─────────────┐  ┌────────────────────┐      │
+│   │DocumentUpload│  │ DocumentList │  │  ChatInput  │  │    ActionBar       │      │
+│   │  (dropzone)  │  │  (sidebar)   │  │  + ChatMsg  │  │ (summarize/extract │      │
+│   └──────────────┘  └──────────────┘  └─────────────┘  │  /compare)         │      │
+│                                                        └────────────────────┘      │
+│                        ┌──────────────────────────┐                                │
+│                        │     services/api.js      │  (Axios HTTP client)          │
+│                        └──────────────────────────┘                               │
 └────────────────────────────────────┬───────────────────────────────────────────────┘
                                      │  REST / JSON  (CORS enabled)
                                      │
 ┌────────────────────────────────────▼───────────────────────────────────────────────┐
 │                           BACKEND (Spring Boot 3 / Java 21)                        │
 │                                                                                    │
-│  ┌─────────────────────────────── HTTP Layer ──────────────────────────────────┐  │
-│  │  DocumentController   ChatController   SummaryController                    │  │
-│  │  ExtractionController ComparisonController                                  │  │
-│  └──────────────────────────────────┬──────────────────────────────────────────┘  │
+│  ┌─────────────────────────────── HTTP Layer ──────────────────────────────────┐   │
+│  │  DocumentController   ChatController   SummaryController                    │   │
+│  │  ExtractionController ComparisonController                                  │   │
+│  └──────────────────────────────────┬──────────────────────────────────────────┘   │
 │                                     │                                              │
-│  ┌─────────────────────────── Service Layer ───────────────────────────────────┐  │
+│  ┌─────────────────────────── Service Layer ────────────────────────────────────┐  │
 │  │  DocumentService    DocumentProcessingService    RagService                  │  │
 │  │  SummaryService     ExtractionService            ComparisonService           │  │
 │  └────────────┬──────────────────────────┬──────────────────────────────────────┘  │
-│               │                          │                                          │
-│  ┌────────────▼────────────┐  ┌──────────▼────────────────────────────────────┐  │
-│  │    Data Access Layer    │  │          AI / Integration Layer               │  │
-│  │                         │  │                                               │  │
-│  │  DocumentRepository     │  │  VectorStore (pgvector via Spring AI)         │  │
-│  │  DocumentChunkRepository│  │  EmbeddingModel (Jina AI via Spring AI)       │  │
-│  │  (Spring Data JPA)      │  │  ChatClient (Groq Cloud via Spring AI)        │  │
-│  └────────────┬────────────┘  └────────────────────────┬──────────────────────┘  │
+│               │                          │                                         │
+│  ┌────────────▼────────────┐  ┌──────────▼────────────────────────────────────┐    │
+│  │    Data Access Layer    │  │          AI / Integration Layer               │    │
+│  │                         │  │                                               │    │
+│  │  DocumentRepository     │  │  VectorStore (pgvector via Spring AI)         │    │
+│  │  DocumentChunkRepository│  │  EmbeddingModel (Jina AI via Spring AI)       │    │
+│  │  (Spring Data JPA)      │  │  ChatClient (Groq Cloud via Spring AI)        │    │
+│  └────────────┬────────────┘  └─────────────────────────┬─────────────────────┘    │
 │               │                                         │                          │
 └───────────────┼─────────────────────────────────────────┼──────────────────────────┘
                 │                                         │
   ┌─────────────▼──────────────┐          ┌──────────────▼────────────────────────┐
-  │      PostgreSQL             │          │           Cloud APIs                  │
+  │      PostgreSQL            │          │           Cloud APIs                  │
   │  ┌────────────────────┐    │          │  ┌──────────────┐  ┌───────────────┐  │
   │  │  documents table   │    │          │  │  Groq Cloud  │  │   Jina AI     │  │
   │  │  document_chunks   │    │          │  │  (LLM)       │  │  (Embeddings) │  │
@@ -122,7 +122,7 @@ All three services are containerised and orchestrated by Docker Compose. They sh
 │                           docker-compose.yml                             │
 │                         (Docker Bridge Network)                          │
 │                                                                          │
-│  ┌─────────────────────┐   ┌───────────────────────┐   ┌─────────────┐  │
+│  ┌─────────────────────┐   ┌────────────────────────┐   ┌─────────────┐  │
 │  │   frontend          │   │      backend           │   │  postgres   │  │
 │  │  (Nginx + React)    │   │  (Spring Boot JAR)     │   │  + pgvector │  │
 │  │                     │   │                        │   │             │  │
@@ -133,14 +133,14 @@ All three services are containerised and orchestrated by Docker Compose. They sh
 │  │  (multi-stage build)│   │  (multi-stage build)   │   │  pgvector/  │  │
 │  │                     │   │                        │   │  pgvector   │  │
 │  │  depends_on:backend │   │  depends_on: postgres  │   │             │  │
-│  └─────────────────────┘   └───────────────────────┘   └─────────────┘  │
+│  └─────────────────────┘   └────────────────────────┘   └─────────────┘  │
 │                                                                          │
 │  Volumes:                                                                │
-│    postgres_data → /var/lib/postgresql/data  (persistent DB)            │
-│    ./uploads → /app/uploads                  (raw uploaded files)       │
+│    postgres_data → /var/lib/postgresql/data  (persistent DB)             │
+│    ./uploads → /app/uploads                  (raw uploaded files)        │
 │                                                                          │
-│  Environment Variables (from .env):                                     │
-│    GROQ_API_KEY, JINA_API_KEY, DB_PASSWORD                              │
+│  Environment Variables (from .env):                                      │
+│    GROQ_API_KEY, JINA_API_KEY, DB_PASSWORD                               │
 └──────────────────────────────────────────────────────────────────────────┘
                                     │
                           Host Machine (localhost)
@@ -196,8 +196,8 @@ All three services are containerised and orchestrated by Docker Compose. They sh
   │                       │                    │  POST /v1/embeddings    │
   │                       │                    │─────────────────────────▶ Jina AI
   │                       │                    │  question vector        │
-  │                       │                    │◀─────────────────────────│
-  │                       │                    │  pgvector cosine search  │
+  │                       │                    │◀────────────────────────│
+  │                       │                    │  pgvector cosine search │
   │                       │                    │  (top-5 chunks by docId)│
   │                       │                    │─────────┐               │
   │                       │                    │  Build RAG prompt       │
@@ -205,7 +205,7 @@ All three services are containerised and orchestrated by Docker Compose. They sh
   │                       │                    │  POST /openai/v1/chat/completions
   │                       │                    │─────────────────────────▶ Groq LLM
   │                       │                    │  Generated answer       │
-  │                       │                    │◀─────────────────────────│
+  │                       │                    │◀────────────────────────│
   │                       │                    │  Attach citations       │
   │                       │  ChatResponse      │  (cross-ref vector IDs) │
   │                       │◀───────────────────│                         │
@@ -220,22 +220,22 @@ All three services are containerised and orchestrated by Docker Compose. They sh
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                      PRESENTATION LAYER                         │
-│  React 18 + Vite   │  Tailwind CSS   │  react-dropzone         │
-│  react-markdown    │  Axios          │  Nginx (Docker serve)   │
+│  React 18 + Vite   │  Tailwind CSS   │  react-dropzone          │
+│  react-markdown    │  Axios          │  Nginx (Docker serve)    │
 ├─────────────────────────────────────────────────────────────────┤
 │                      APPLICATION LAYER                          │
-│  Spring Boot 3     │  Java 21        │  Spring AI 1.0          │
-│  Spring Data JPA   │  Spring Web     │  Apache Tika            │
+│  Spring Boot 3     │  Java 21        │  Spring AI 1.0           │
+│  Spring Data JPA   │  Spring Web     │  Apache Tika             │
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                               │
-│  PostgreSQL 16     │  pgvector ext   │  Local File System      │
+│  PostgreSQL 16     │  pgvector ext   │  Local File System       │
 ├─────────────────────────────────────────────────────────────────┤
 │                   EXTERNAL AI SERVICES                          │
-│  Groq Cloud (LLM)  │  Jina AI (Embeddings)                     │
-│  llama-3.1-8b-instant  │  jina-embeddings-v3 (1024-dim)        │
+│  Groq Cloud (LLM)  │  Jina AI (Embeddings)                      │
+│  llama-3.1-8b-instant  │  jina-embeddings-v3 (1024-dim)         │
 ├─────────────────────────────────────────────────────────────────┤
 │                   INFRASTRUCTURE / DEVOPS                       │
-│  Docker            │  Docker Compose │  Multi-stage Dockerfiles│
+│  Docker            │  Docker Compose │  Multi-stage Dockerfiles │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
