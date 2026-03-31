@@ -4,3 +4,5 @@ target/
 frontend/node_modules/
 uploads/
 *.log
+.env
+.env.*

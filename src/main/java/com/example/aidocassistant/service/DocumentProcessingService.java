@@ -27,8 +27,8 @@ import java.util.List;
  *   Vector similarity search works best on short, focused passages. A 50-page PDF would
  *   produce a single massive embedding that averages out all topics, making it hard to
  *   retrieve the specific paragraph that answers a narrow question. Chunking lets us
- *   retrieve only the most relevant passages.
  *
+ *   retrieve only the most relevant passages.
  * Why use overlapping chunks?
  *   If a sentence is split across two chunk boundaries, neither chunk alone contains the
  *   full sentence. A 50-token overlap between adjacent chunks ensures every sentence

@@ -1,0 +1,33 @@
+# ── Caddy Reverse Proxy ───────────────────────────────────────────────────────
+#
+# Local dev  : serves http://localhost:3000 (no HTTPS needed)
+# Production : set DOMAIN=yourapp.duckdns.org in .env
+#              Caddy auto-fetches and renews a Let's Encrypt certificate
+#
+# How it works:
+#   Browser → Caddy (443/80) → frontend nginx (React + /api proxy) → backend
+
+# ── Local development ─────────────────────────────────────────────────────────
+:3000 {
+    reverse_proxy frontend:80
+}
+
+# ── Production HTTPS (only active when DOMAIN env var is set) ─────────────────
+{$DOMAIN:} {
+    # Caddy automatically obtains and renews SSL certificate from Let's Encrypt
+    reverse_proxy frontend:80
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options    "nosniff"
+        X-Frame-Options           "DENY"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+    }
+
+    # Access log
+    log {
+        output stdout
+        format console
+    }
+}

@@ -101,3 +101,6 @@ $RECYCLE.BIN/
 
 # ── Personal / interview notes ────────────────────────────────────────────────
 INTERVIEW_TALKING_POINTS.md
+
+# ── Local documentation (kept locally, not in repo) ──────────────────────────
+docs/

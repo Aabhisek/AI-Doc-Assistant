@@ -1,17 +1,19 @@
-version: "3.9"
-
 # ── AI Document Assistant — Docker Compose ────────────────────────────────────
 #
 # Services:
 #   postgres  — PostgreSQL 16 with pgvector extension
 #   backend   — Spring Boot API (chat via Groq, embeddings via Jina AI)
 #   frontend  — React app (via nginx)
+#   caddy     — Reverse proxy with automatic HTTPS (Let's Encrypt)
 #
-# Quick start:
-#   export GROQ_API_KEY=your_key_here    # free key at console.groq.com
-#   export JINA_API_KEY=your_key_here    # free key at jina.ai (1M tokens/month)
-#   docker compose up -d
+# Local dev:
+#   docker compose up -d --build
 #   open http://localhost:3000
+#
+# Production (Oracle Cloud / any VPS):
+#   Set DOMAIN and DUCKDNS_TOKEN in your .env file
+#   docker compose up -d --build
+#   open https://your-domain.duckdns.org
 
 services:
 
@@ -22,9 +24,7 @@ services:
     environment:
       POSTGRES_DB:       ragdb
       POSTGRES_USER:     postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${DB_PASS:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -32,8 +32,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
 
   # ── Spring Boot Backend ─────────────────────────────────────────────────────
+  # Port 8080 is NOT exposed to the host — only reachable inside the Docker network.
+  # nginx proxies /api/* → backend:8080 internally.
   backend:
     build:
       context: .
@@ -45,13 +53,22 @@ services:
     environment:
       DB_URL:          jdbc:postgresql://postgres:5432/ragdb
       DB_USER:         postgres
-      DB_PASS:         postgres
+      DB_PASS:         ${DB_PASS:-postgres}
       GROQ_API_KEY:    ${GROQ_API_KEY}
       JINA_API_KEY:    ${JINA_API_KEY}
-    ports:
-      - "8080:8080"
     volumes:
       - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
     restart: unless-stopped
 
   # ── React Frontend (nginx) ──────────────────────────────────────────────────
@@ -61,11 +78,43 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: rag-frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+  # ── Caddy — Reverse Proxy + Automatic HTTPS ─────────────────────────────────
+  # Local dev:   serves http://localhost:3000 (plain HTTP, no cert needed)
+  # Production:  serves https://${DOMAIN} with auto-renewed Let's Encrypt cert
+  caddy:
+    image: caddy:2-alpine
+    container_name: rag-caddy
+    depends_on:
+      - frontend
     ports:
-      - "3000:80"
+      - "80:80"
+      - "443:443"
+      - "3000:3000"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
 volumes:
   postgres_data:
   uploads_data:
+  caddy_data:
+  caddy_config:

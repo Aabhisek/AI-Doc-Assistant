@@ -102,6 +102,12 @@
             <version>3.0.0</version>
         </dependency>
 
+        <!-- Spring Boot Actuator — exposes /actuator/health for Docker healthcheck + monitoring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
